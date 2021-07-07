@@ -22,6 +22,8 @@ namespace TSLADailySummary
         [FunctionName("TSLADailySummary")]
         public static async System.Threading.Tasks.Task RunAsync([TimerTrigger("0 0 0/1 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
+            log.LogInformation("UPDATE 1");
+
             // Log da execução.
             log.LogInformation($"Function triggered at: {DateTime.Now}");
 
