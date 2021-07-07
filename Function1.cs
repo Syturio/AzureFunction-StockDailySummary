@@ -10,24 +10,24 @@ namespace TSLADailySummary
 {
     public static class TSLADailySummary
     {
-        // Definir as variáveis.
+        // Definir as variÃ¡veis.
         static string FILE_NAME = "tesla_data.json";
         static string CONTAINER_NAME = "container-output-api";
 
-        // Variável de environment na Azure > Function > Configuration > Application settings.
+        // VariÃ¡vel de environment na Azure > Function > Configuration > Application settings.
         static string CONNECTION_STRING = Environment.GetEnvironmentVariable("AzureConnectionString", EnvironmentVariableTarget.Process);
         static string API_KEY = Environment.GetEnvironmentVariable("AzureAPIkey", EnvironmentVariableTarget.Process);
 
-        // Código da function.
+        // CÃ³digo da function.
         [FunctionName("TSLADailySummary")]
         public static async System.Threading.Tasks.Task RunAsync([TimerTrigger("0 0 0/1 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
-            log.LogInformation("UPDATE 2");
+            log.LogInformation("UPDATE 3");
 
-            // Log da execução.
+            // Log da execuÃ§Ã£o.
             log.LogInformation($"Function triggered at: {DateTime.Now}");
 
-            // Ir buscar os dados à API do YahooFinance.
+            // Ir buscar os dados Ã  API do YahooFinance.
             var APIclient = new HttpClient();
             var APIrequest = new HttpRequestMessage
             {
@@ -44,26 +44,26 @@ namespace TSLADailySummary
                 // Confirmar se o pedido foi feito com sucesso.
                 APIresponse.EnsureSuccessStatusCode();
 
-                // Passar a resposta para a variável, em formato string.
+                // Passar a resposta para a variÃ¡vel, em formato string.
                 // estava var antes, confirmar se funciona assim
                 string fileContent = await APIresponse.Content.ReadAsStringAsync();
 
-                // Referência do blob client.
+                // ReferÃªncia do blob client.
                 BlobServiceClient BSC = new BlobServiceClient(CONNECTION_STRING);
 
-                // Referência do container.
+                // ReferÃªncia do container.
                 var containerClient = BSC.GetBlobContainerClient(CONTAINER_NAME);
 
-                // Referência do blob.
+                // ReferÃªncia do blob.
                 BlobClient blobClient = containerClient.GetBlobClient(FILE_NAME);
 
-                // Converter para bytes e guardar na memória.
+                // Converter para bytes e guardar na memÃ³ria.
                 using (MemoryStream memoryStreamFileContent = new MemoryStream(Encoding.UTF8.GetBytes(fileContent)))
                 {
                     // Fazer upload do blob com overwrite.
                     await blobClient.UploadAsync(memoryStreamFileContent, true);
 
-                    // Log de finalização.
+                    // Log de finalizaÃ§Ã£o.
                     log.LogInformation($"Function finalized at: {DateTime.Now}");
                 }
             }
