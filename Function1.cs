@@ -17,12 +17,33 @@ namespace TSLADailySummary
         // Variável de environment na Azure > Function > Configuration > Application settings.
         static string CONNECTION_STRING = Environment.GetEnvironmentVariable("AzureConnectionString", EnvironmentVariableTarget.Process);
         static string API_KEY = Environment.GetEnvironmentVariable("AzureAPIkey", EnvironmentVariableTarget.Process);
+        static string API_URI = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=";
+
 
         // Código da function.
         [FunctionName("TSLADailySummary")]
         public static async System.Threading.Tasks.Task RunAsync([TimerTrigger("0 0 0/1 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
-            log.LogInformation("UPDATE 5");
+            log.LogInformation("UPDATE 6");
+
+            // Referência do blob client.
+            BlobServiceClient BSC = new BlobServiceClient(CONNECTION_STRING);
+
+            // Referência do container.
+            var containerClient0 = BSC.GetBlobContainerClient("container-formdata");
+
+            // Referência do blob.
+            BlobClient blobClient0 = containerClient0.GetBlobClient("formdata-result.json");
+
+
+
+           
+            string URI_LINK_CONCANATED = API_URI + "TSLA";
+
+
+
+
+
 
             // Log da execução.
             log.LogInformation($"Function triggered at: {DateTime.Now}");
@@ -32,7 +53,7 @@ namespace TSLADailySummary
             var APIrequest = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri("https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=TSLA"),
+                RequestUri = new Uri(URI_LINK_CONCANATED),
                 Headers =
                 {
                     { "x-rapidapi-key", API_KEY },
@@ -49,7 +70,7 @@ namespace TSLADailySummary
                 string fileContent = await APIresponse.Content.ReadAsStringAsync();
 
                 // Referência do blob client.
-                BlobServiceClient BSC = new BlobServiceClient(CONNECTION_STRING);
+                //BlobServiceClient BSC = new BlobServiceClient(CONNECTION_STRING);
 
                 // Referência do container.
                 var containerClient = BSC.GetBlobContainerClient(CONTAINER_NAME);
