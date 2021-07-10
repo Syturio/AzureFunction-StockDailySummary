@@ -13,12 +13,12 @@ namespace TSLADailySummary
         // Definir as variáveis.
         static string FILE_NAME = "tesla_data.json";
         static string CONTAINER_NAME = "container-output-api";
-
+        
         // Variável de environment na Azure > Function > Configuration > Application settings.
         static string CONNECTION_STRING = Environment.GetEnvironmentVariable("AzureConnectionString", EnvironmentVariableTarget.Process);
         static string API_KEY = Environment.GetEnvironmentVariable("AzureAPIkey", EnvironmentVariableTarget.Process);
-        static string API_URI = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=";
 
+        static string API_URI = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=";
 
         // Código da function.
         [FunctionName("TSLADailySummary")]
@@ -37,8 +37,22 @@ namespace TSLADailySummary
 
 
 
-           
-            string URI_LINK_CONCANATED = API_URI + "TSLA";
+            var response = await blobClient0.DownloadAsync();
+            var line = "";
+            using (var streamReader = new StreamReader(response.Value.Content))
+            {
+                while (!streamReader.EndOfStream)
+                {
+                    line = await streamReader.ReadLineAsync();
+                    Console.WriteLine(line);
+                }
+            }
+
+
+
+
+
+            string URI_LINK_CONCANATED = API_URI + line;
 
 
 
