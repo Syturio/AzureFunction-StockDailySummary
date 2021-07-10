@@ -36,7 +36,7 @@ namespace StockDailySummary
         {
             // Log da execução.
             log.LogInformation($"Function triggered at: {DateTime.Now}");
-            log.LogInformation("Update number: 9");
+            log.LogInformation("Update number: 10");
 
             // Referência do blob client.
             BlobServiceClient BSC = new BlobServiceClient(CONNECTION_STRING);
