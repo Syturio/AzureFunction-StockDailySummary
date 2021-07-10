@@ -38,7 +38,7 @@ namespace TSLADailySummary
 
 
             var response = await blobClient0.DownloadAsync();
-            var line = "";
+            string line;
             using (var streamReader = new StreamReader(response.Value.Content))
             {
                 while (!streamReader.EndOfStream)
