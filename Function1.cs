@@ -7,98 +7,64 @@ using Azure.Storage.Blobs;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace TSLADailySummary
+namespace StockDailySummary
 {
-    public class Account
+    public class _FormValues
     {
-        public string email { get; set; }
-        public string stock { get; set; }
+        // Valores do formulário inseridos pelo user no frontend.
+        public string _Email { get; set; }
+        public string _Stock { get; set; }
     }
 
-    public static class TSLADailySummary
+    public static class StockDailySummary
     {
-        // Definir as variáveis.
-        static string FILE_NAME = "tesla_data.json";
-        static string CONTAINER_NAME = "container-output-api";
-        
-        // Variável de environment na Azure > Function > Configuration > Application settings.
+        // Variáveis gerais.
+        static string FILE_NAME_OUTPUT = "tesla_data.json";
+        static string FILE_NAME_FORM = "formdata-result.json";
+        static string CONTAINER_NAME_OUTPUT = "container-output-api";
+        static string CONTAINER_NAME_FORM = "container-formdata";
+        static string API_URI = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=";
+
+        // Variáveis de environment na Azure > Function > Configuration > Application settings.
         static string CONNECTION_STRING = Environment.GetEnvironmentVariable("AzureConnectionString", EnvironmentVariableTarget.Process);
         static string API_KEY = Environment.GetEnvironmentVariable("AzureAPIkey", EnvironmentVariableTarget.Process);
 
-        static string API_URI = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=";
-
-        // Código da function.
-        [FunctionName("TSLADailySummary")]
+        [FunctionName("StockDailySummary")]
         public static async System.Threading.Tasks.Task RunAsync([TimerTrigger("0 0 0/1 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
-            //static string json = @"{'Email': 'james@example.com','Active': true}";
-            //static Account account = JsonConvert.DeserializeObject<Account>(json);
-            //log.LogInformation(account.Email);
-
-
-
-
-
-            log.LogInformation("UPDATE 8");
+            // Log da execução.
+            log.LogInformation($"Function triggered at: {DateTime.Now}");
+            log.LogInformation("Update number: 8");
 
             // Referência do blob client.
             BlobServiceClient BSC = new BlobServiceClient(CONNECTION_STRING);
 
             // Referência do container.
-            var containerClient0 = BSC.GetBlobContainerClient("container-formdata");
+            var containerClient_Form = BSC.GetBlobContainerClient(CONTAINER_NAME_FORM);
 
             // Referência do blob.
-            BlobClient blobClient0 = containerClient0.GetBlobClient("formdata-result.json");
+            BlobClient blobClient_Form = containerClient_Form.GetBlobClient(CONTAINER_NAME_OUTPUT);
 
-
-
-
-
-            
-
-
-            var response = await blobClient0.DownloadAsync();
-            var line = (dynamic)null;
+            // Ler o conteúdo do ficheiro e passar para uma variável.
+            var response = await blobClient_Form.DownloadAsync();
+            var result = (dynamic)null;
             using (var streamReader = new StreamReader(response.Value.Content))
             {
                 while (!streamReader.EndOfStream)
                 {
-                    line = await streamReader.ReadLineAsync();
+                    result = await streamReader.ReadLineAsync();
                 }
             }
 
-            Account account = JsonConvert.DeserializeObject<Account>(line);
+            // Fazer o deserialize dos valores do json.
+            _FormValues formValue = JsonConvert.DeserializeObject<_FormValues>(result);
 
-            log.LogInformation(account.stock);
+            // Log sobre o stock e e-mail selecionado.
+            log.LogInformation("Stock selected: " + formValue._Stock);
+            log.LogInformation("E-mail selected: " + formValue._Email);
 
-
-
-            /*
-            var response = await blobClient0.DownloadAsync();
-            var line = (dynamic)null;
-            using (var streamReader = new StreamReader(response.Value.Content))
-            {
-                while (!streamReader.EndOfStream)
-                {
-                    line = await streamReader.ReadLineAsync();
-                    Console.WriteLine(line);
-                }
-            }
-            */
-
-
-
-
-
-            string URI_LINK_CONCANATED = API_URI + account.stock;
-
-
-
-
-
-
-            // Log da execução.
-            log.LogInformation($"Function triggered at: {DateTime.Now}");
+            // Juntar o link da api uri com o stock selecionado pelo user no frontend.
+            string URI_LINK_CONCANATED = API_URI + formValue._Stock;            
 
             // Ir buscar os dados à API do YahooFinance.
             var APIclient = new HttpClient();
@@ -118,23 +84,19 @@ namespace TSLADailySummary
                 APIresponse.EnsureSuccessStatusCode();
 
                 // Passar a resposta para a variável, em formato string.
-                // estava var antes, confirmar se funciona assim
                 string fileContent = await APIresponse.Content.ReadAsStringAsync();
 
-                // Referência do blob client.
-                //BlobServiceClient BSC = new BlobServiceClient(CONNECTION_STRING);
-
                 // Referência do container.
-                var containerClient = BSC.GetBlobContainerClient(CONTAINER_NAME);
+                var containerClient_Output = BSC.GetBlobContainerClient(CONTAINER_NAME_OUTPUT);
 
                 // Referência do blob.
-                BlobClient blobClient = containerClient.GetBlobClient(FILE_NAME);
+                BlobClient blobClient_Output = containerClient_Output.GetBlobClient(FILE_NAME_OUTPUT);
 
                 // Converter para bytes e guardar na memória.
                 using (MemoryStream memoryStreamFileContent = new MemoryStream(Encoding.UTF8.GetBytes(fileContent)))
                 {
                     // Fazer upload do blob com overwrite.
-                    await blobClient.UploadAsync(memoryStreamFileContent, true);
+                    await blobClient_Output.UploadAsync(memoryStreamFileContent, true);
 
                     // Log de finalização.
                     log.LogInformation($"Function finalized at: {DateTime.Now}");
