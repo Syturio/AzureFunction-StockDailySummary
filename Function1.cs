@@ -19,10 +19,12 @@ namespace StockDailySummary
     public static class StockDailySummary
     {
         // Variáveis gerais.
-        static string FILE_NAME_OUTPUT = "tesla_data.json";
-        static string FILE_NAME_FORM = "formdata-result.json";
         static string CONTAINER_NAME_OUTPUT = "container-output-api";
         static string CONTAINER_NAME_FORM = "container-formdata";
+
+        static string FILE_NAME_OUTPUT = "tesla_data.json";
+        static string FILE_NAME_FORM = "formdata-result.json";
+
         static string API_URI = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=";
 
         // Variáveis de environment na Azure > Function > Configuration > Application settings.
@@ -34,7 +36,7 @@ namespace StockDailySummary
         {
             // Log da execução.
             log.LogInformation($"Function triggered at: {DateTime.Now}");
-            log.LogInformation("Update number: 8");
+            log.LogInformation("Update number: 9");
 
             // Referência do blob client.
             BlobServiceClient BSC = new BlobServiceClient(CONNECTION_STRING);
@@ -43,7 +45,7 @@ namespace StockDailySummary
             var containerClient_Form = BSC.GetBlobContainerClient(CONTAINER_NAME_FORM);
 
             // Referência do blob.
-            BlobClient blobClient_Form = containerClient_Form.GetBlobClient(CONTAINER_NAME_OUTPUT);
+            BlobClient blobClient_Form = containerClient_Form.GetBlobClient(FILE_NAME_FORM);
 
             // Ler o conteúdo do ficheiro e passar para uma variável.
             var response = await blobClient_Form.DownloadAsync();
