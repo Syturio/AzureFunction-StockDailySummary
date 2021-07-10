@@ -11,21 +11,12 @@ namespace TSLADailySummary
 {
     public class Account
     {
-        public string Email { get; set; }
-        public bool Active { get; set; }
+        public string email { get; set; }
+        public string stock { get; set; }
     }
 
     public static class TSLADailySummary
     {
-        static string json = @"{'Email': 'james@example.com','Active': true}";
-        static Account account = JsonConvert.DeserializeObject<Account>(json);
-
-
-
-
-
-
-
         // Definir as variáveis.
         static string FILE_NAME = "tesla_data.json";
         static string CONTAINER_NAME = "container-output-api";
@@ -40,14 +31,15 @@ namespace TSLADailySummary
         [FunctionName("TSLADailySummary")]
         public static async System.Threading.Tasks.Task RunAsync([TimerTrigger("0 0 0/1 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
-
-            log.LogInformation(account.Email);
-
-
-
+            //static string json = @"{'Email': 'james@example.com','Active': true}";
+            //static Account account = JsonConvert.DeserializeObject<Account>(json);
+            //log.LogInformation(account.Email);
 
 
-            log.LogInformation("UPDATE 7");
+
+
+
+            log.LogInformation("UPDATE 8");
 
             // Referência do blob client.
             BlobServiceClient BSC = new BlobServiceClient(CONNECTION_STRING);
@@ -60,6 +52,28 @@ namespace TSLADailySummary
 
 
 
+
+
+            
+
+
+            var response = await blobClient0.DownloadAsync();
+            var line = (dynamic)null;
+            using (var streamReader = new StreamReader(response.Value.Content))
+            {
+                while (!streamReader.EndOfStream)
+                {
+                    line = await streamReader.ReadLineAsync();
+                }
+            }
+
+            Account account = JsonConvert.DeserializeObject<Account>(line);
+
+            log.LogInformation(account.stock);
+
+
+
+            /*
             var response = await blobClient0.DownloadAsync();
             var line = (dynamic)null;
             using (var streamReader = new StreamReader(response.Value.Content))
@@ -70,12 +84,13 @@ namespace TSLADailySummary
                     Console.WriteLine(line);
                 }
             }
+            */
 
 
 
 
 
-            string URI_LINK_CONCANATED = API_URI + line;
+            string URI_LINK_CONCANATED = API_URI + account.stock;
 
 
 
