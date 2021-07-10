@@ -12,8 +12,8 @@ namespace StockDailySummary
     public class _FormValues
     {
         // Valores do formulário inseridos pelo user no frontend.
-        public string _Email { get; set; }
-        public string _Stock { get; set; }
+        public string email { get; set; }
+        public string stock { get; set; }
     }
 
     public static class StockDailySummary
@@ -62,11 +62,11 @@ namespace StockDailySummary
             _FormValues formValue = JsonConvert.DeserializeObject<_FormValues>(result);
 
             // Log sobre o stock e e-mail selecionado.
-            log.LogInformation("Stock selected: " + formValue._Stock);
-            log.LogInformation("E-mail selected: " + formValue._Email);
+            log.LogInformation("Stock selected: " + formValue.stock);
+            log.LogInformation("E-mail selected: " + formValue.email);
 
             // Juntar o link da api uri com o stock selecionado pelo user no frontend.
-            string URI_LINK_CONCANATED = API_URI + formValue._Stock;            
+            string URI_LINK_CONCANATED = API_URI + formValue.stock;            
 
             // Ir buscar os dados à API do YahooFinance.
             var APIclient = new HttpClient();
