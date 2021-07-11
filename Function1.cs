@@ -22,7 +22,7 @@ namespace StockDailySummary
         static string CONTAINER_NAME_OUTPUT = "container-output-api";
         static string CONTAINER_NAME_FORM = "container-formdata";
 
-        static string FILE_NAME_OUTPUT = "tesla_data.json";
+        static string FILE_NAME_OUTPUT = "apioutput-result.json";
         static string FILE_NAME_FORM = "formdata-result.json";
 
         static string API_URI = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=";
