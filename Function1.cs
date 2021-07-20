@@ -32,11 +32,11 @@ namespace StockDailySummary
         static string API_KEY = Environment.GetEnvironmentVariable("AzureAPIkey", EnvironmentVariableTarget.Process);
 
         [FunctionName("StockDailySummary")]
-        public static async System.Threading.Tasks.Task RunAsync([TimerTrigger("0 0 0/1 * * 1-5")]TimerInfo myTimer, ILogger log)
+        public static async System.Threading.Tasks.Task RunAsync([TimerTrigger("0 5 21 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
             // Log da execução.
             log.LogInformation($"Function triggered at: {DateTime.Now}");
-            log.LogInformation("Update number: 13");
+            log.LogInformation("Update number: 14");
 
             // Referência do blob client.
             BlobServiceClient BSC = new BlobServiceClient(CONNECTION_STRING);
